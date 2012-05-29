@@ -6,3 +6,6 @@ if (geddy.config.environment != 'development') {
   });
 }
 
+geddy.todos = [];
+geddy.model.adapter = {};
+geddy.model.adapter.Todo = require(process.cwd() + '/lib/model_adapters/todo');
