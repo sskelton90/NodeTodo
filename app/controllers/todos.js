@@ -61,7 +61,16 @@ this.update = function (req, resp, params) {
 };
 
   this.remove = function (req, resp, params) {
-    this.respond({params: params});
+    var self = this;
+    geddy.model.adapter.Todo.remove(params.id, function(err) {
+      if (err) {
+        params.errors = err;
+        self.tranfer('edit');
+      }
+      else {
+        self.redirect({controller: self.name});
+      }
+    })
   };
 
 };
