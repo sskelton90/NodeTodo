@@ -3,7 +3,10 @@ var Todos = function () {
   this.respondsWith = ['html', 'json', 'xml', 'js', 'txt'];
 
   this.index = function (req, resp, params) {
-    this.respond({params: params});
+    var self = this;
+    geddy.model.adapter.Todo.all(function (err, todos) {
+      self.respond({params: params, todos:todos});
+    });
   };
 
   this.add = function (req, resp, params) {
@@ -34,13 +37,28 @@ var Todos = function () {
   };
 
   this.edit = function (req, resp, params) {
-    this.respond({params: params});
+    var self = this;
+    geddy.model.Todo.load(params.id, function(err, todo) {
+      self.respond({params: params, todo: todo});
+    });
   };
 
-  this.update = function (req, resp, params) {
-    // Save the resource, then display the item page
-    this.redirect({controller: this.name, id: params.id});
-  };
+this.update = function (req, resp, params) {
+  var self = this;
+  geddy.model.adapter.Todo.load(params.id, function (err, todo) {
+    todo.status = params.status;
+    todo.title = params.title;
+    todo.save(function (err, data) {
+      if (err) {
+        params.errors = err;
+        self.transfer('edit');
+      }
+      else {
+        self.redirect({controller: self.name});
+      }
+    });
+  });
+};
 
   this.remove = function (req, resp, params) {
     this.respond({params: params});
